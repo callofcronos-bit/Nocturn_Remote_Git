@@ -1,0 +1,52 @@
+using System.Collections;
+using UnityEngine;
+
+// ท่า 1: Bullet Cone 6 นัด x3
+public class ConeState : BossState
+{
+    public ConeState(BossNocturn b) : base(b) { }
+    public override IEnumerator Execute()
+    {
+        for (int wave = 0; wave < 3; wave++)
+        {
+            boss.FacePlayer();
+            const float spread = 60f;
+            for (int i = 0; i < 6; i++)
+                boss.Shoot(-spread / 2 + spread / 5 * i);
+            yield return new WaitForSeconds(0.7f);
+        }
+    }
+}
+
+// ท่า 2: ปล่อยรอบตัว 12 นัด x2
+public class RingState : BossState
+{
+    public RingState(BossNocturn b) : base(b) { }
+    public override IEnumerator Execute()
+    {
+        for (int wave = 0; wave < 2; wave++)
+        {
+            float offset = wave * 15f;
+            for (int i = 0; i < 12; i++)
+                boss.Shoot(offset + i * 30f);
+            yield return new WaitForSeconds(1f);
+        }
+    }
+}
+
+// ท่า 3: ปล่อยรอบตัวแล้วรวบเข้ากลางบอส
+public class ImplodeState : BossState
+{
+    public ImplodeState(BossNocturn b) : base(b) { }
+    public override IEnumerator Execute()
+    {
+        const int count = 16;
+        const float radius = 8f;
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 offset = Quaternion.Euler(0, i * (360f / count), 0) * Vector3.forward * radius;
+            boss.ShootFrom(boss.transform.position + offset, -offset.normalized);
+        }
+        yield return new WaitForSeconds(1.5f);
+    }
+}
